@@ -37,7 +37,10 @@ with open('README.md', encoding='utf-8') as readme_file:
 
 setup(
     name='pyocd-pemicro',
-    version='0.1.0',
+    use_scm_version={
+        'local_scheme': 'dirty-tag',
+        'write_to': 'pyocd_pemicro/_version.py'
+    },
     description='PyOCD debug probe plugin for PEMicro debug probes',
     long_description_content_type="text/markdown",
     long_description=README,
@@ -64,10 +67,6 @@ setup(
         'Topic :: System :: Hardware',
         'Topic :: Utilities'
         ],
-    use_scm_version={
-        'local_scheme': 'dirty-tag',
-        'write_to': 'pyocd_pemicro/_version.py'
-    },
     python_requires=">=3.6",
     setup_requires=[
         'setuptools>=40.0',
