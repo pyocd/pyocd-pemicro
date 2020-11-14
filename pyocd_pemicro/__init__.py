@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
-# Copyright 2020 NXP
+# Copyright © 2020 NXP
+# Copyright @ 2020 Chris Reed
 #
-# SPDX-License-Identifier:
-# BSD-3-Clause
+# SPDX-License-Identifier: BSD-3-Clause
 #
 # Redistribution and use in source and binary forms, with or without modification,
 # are permitted provided that the following conditions are met:
@@ -30,11 +30,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# This is PEMicro debug probes support plugin for PyOCD project
-# PEMicro company has been notified and they are agree.
-"""PEMicro PyOCD plugin Python implementation by NXP.
+"""PEMicro pyOCD plugin Python implementation by NXP.
 
-The basics support of PEmicro probes under PyOCD project.
+Provides basic support of PEMicro probes for the pyOCD project.
+The PEMicro company has been notified and they support this effort.
 """
 
 from pyocd_pemicro.pemicro_probe import *
+
+from ._version import version as __version__
