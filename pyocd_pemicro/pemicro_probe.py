@@ -60,7 +60,7 @@ class PEMicroProbe(DebugProbe):
 
     @classmethod
     def _get_pemicro(cls):
-        # PEMicroException is raised by PyPemicro if the JLink DLL cannot be found.
+        # PEMicroException is raised by PyPemicro if the PEMicro DLL cannot be found.
         try:
             return PyPemicro(log_debug=TRACE.debug,
                              log_err=TRACE.error,
@@ -159,17 +159,12 @@ class PEMicroProbe(DebugProbe):
             # Get available wire protocols.
             # ifaces = self._pemicro.supported_tifs()
             self._supported_protocols = [DebugProbe.Protocol.DEFAULT]
-            # if ifaces & (1 << pylink.enums.JLinkInterfaces.JTAG):
             self._supported_protocols.append(DebugProbe.Protocol.JTAG)
-            # if ifaces & (1 << pylink.enums.JLinkInterfaces.SWD):
             self._supported_protocols.append(DebugProbe.Protocol.SWD)
-            assert len(self._supported_protocols) > 1
 
             # Select default protocol, preferring SWD over JTAG.
-            if DebugProbe.Protocol.SWD in self._supported_protocols:
-                self._default_protocol = DebugProbe.Protocol.SWD
-            else:
-                self._default_protocol = DebugProbe.Protocol.JTAG
+            self._default_protocol = DebugProbe.Protocol.SWD
+
         except PEMicroException as exc:
             six.raise_from(self._convert_exception(exc), exc)
 
