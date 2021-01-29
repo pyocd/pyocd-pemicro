@@ -149,7 +149,7 @@ class PEMicroProbe(DebugProbe):
 
     @property
     def capabilities(self):
-        return {self.Capability.SWO}
+        return {self.Capability.SWO, self.Capability.MANAGED_AP_SELECTION, self.Capability.BANKED_DP_REGISTERS, self.Capability.MANAGED_DPBANKSEL}
 
     def open(self):
         try:
@@ -224,24 +224,27 @@ class PEMicroProbe(DebugProbe):
 
     def reset(self):
         try:
+            # Just do read operation to flush last operation before reset
+            # Obviously the Flush doesn't work as excepted :-(
+            self.read_ap(0)
             self._pemicro.flush_any_queued_data()
 
             # If it's neccessary, change the reset delay
-            delay = int(1000 * max(self.session.options.get('reset.hold_time'), self.session.options.get('reset.post_delay')))
-            if delay is not self._reset_delay_ms:
-                self._pemicro.set_reset_delay_in_ms(delay)
-                self._reset_delay_ms = delay
+            # delay = int(1000 * max(self.session.options.get('reset.hold_time'), self.session.options.get('reset.post_delay')))
+            # if delay is not self._reset_delay_ms:
+            #     self._pemicro.set_reset_delay_in_ms(delay)
+            #     self._reset_delay_ms = delay
 
-            # Try to force reset Hardware
-            self._pemicro.reset_target()
+            # # Try to force reset Hardware
+            # self._pemicro.reset_target()
 
             # Resume the MCU from Halt state
-            self._pemicro.resume_target()
+            #self._pemicro.resume_target()
 
-            # self.assert_reset(asserted=True)
-            # sleep(self.session.options.get('reset.hold_time'))
-            # self.assert_reset(asserted=False)
-            # sleep(self.session.options.get('reset.post_delay'))
+            self.assert_reset(asserted=True)
+            sleep(self.session.options.get('reset.hold_time'))
+            self.assert_reset(asserted=False)
+            sleep(self.session.options.get('reset.post_delay'))
 
         except PEMicroException as exc:
             six.raise_from(self._convert_exception(exc), exc)
