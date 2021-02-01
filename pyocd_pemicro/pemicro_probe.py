@@ -288,7 +288,7 @@ class PEMicroProbe(DebugProbe):
     def read_ap(self, addr, now=True):
         assert type(addr) in (six.integer_types)
         try:
-            value = self._pemicro.read_ap_register(addr=addr, now=now, apselect= ((addr & self.APSEL_APBANKSEL) >> self.APSEL_SHIFT))
+            value = self._pemicro.read_ap_register(addr=(addr & self.APADDR), now=now, apselect= ((addr & self.APSEL_APBANKSEL) >> self.APSEL_SHIFT))
         except PEMicroTransferException as exc:
             six.raise_from(self._convert_exception(exc), exc)
         else:
@@ -300,7 +300,7 @@ class PEMicroProbe(DebugProbe):
     def write_ap(self, addr, data, now = True):
         assert type(addr) in (six.integer_types)
         try:
-            self._pemicro.write_ap_register(addr=addr, value=data, apselect=((addr & self.APSEL_APBANKSEL) >> self.APSEL_SHIFT))
+            self._pemicro.write_ap_register(addr=(addr & self.APADDR), value=data, apselect=((addr & self.APSEL_APBANKSEL) >> self.APSEL_SHIFT))
         except PEMicroTransferException as exc:
             six.raise_from(self._convert_exception(exc), exc)
 
