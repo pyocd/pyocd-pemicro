@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2020 NXP
-# Copyright @ 2020 Chris Reed
+# Copyright © 2020 Chris Reed
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
