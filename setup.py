@@ -83,9 +83,4 @@ setup(
         ],
     },
     zip_safe=True,
-    options={
-        'bdist_wheel': {
-            'universal': True,
-        },
-    },
 )
