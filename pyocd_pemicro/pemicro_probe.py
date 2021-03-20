@@ -44,7 +44,7 @@ from ._version import version as plugin_version
 LOG = logging.getLogger(__name__)
 
 TRACE = LOG.getChild("trace")
-TRACE.setLevel(logging.INFO)
+TRACE.disabled = True
 
 class PEMicroProbe(DebugProbe):
     """! @brief Wraps a PEMicro as a DebugProbe."""
@@ -57,6 +57,10 @@ class PEMicroProbe(DebugProbe):
     APSEL = 0xff000000
     APSEL_SHIFT = 24
     APSEL_APBANKSEL = APSEL | APBANKSEL
+
+    ## Part of the error message for exceptions raised when there isn't a PEMicro library
+    # matching the system's architecture, or other similar reasons.
+    NO_LIBRARY_ERR = "Unable to find any usable library"
 
     @classmethod
     def _get_pemicro(cls):
@@ -80,6 +84,10 @@ class PEMicroProbe(DebugProbe):
                 return []
             return [cls(str(info["id"])) for info in port_list]
         except PEMicroException as exc:
+            # Ignore errors about a missing library, which can happen on systems not supported by
+            # the PEMicro library but on which the plugin is installed.
+            if cls.NO_LIBRARY_ERR in exc.message:
+                return []
             six.raise_from(cls._convert_exception(exc), exc)
 
     @classmethod
@@ -94,6 +102,10 @@ class PEMicroProbe(DebugProbe):
             else:
                 return None
         except PEMicroException as exc:
+            # Ignore errors about a missing library, which can happen on systems not supported by
+            # the PEMicro library but on which the plugin is installed.
+            if cls.NO_LIBRARY_ERR not in exc.message:
+                return None
             six.raise_from(cls._convert_exception(exc), exc)
 
     def __init__(self, serial_number):
