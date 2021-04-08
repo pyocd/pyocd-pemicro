@@ -37,7 +37,7 @@ from time import sleep
 
 from pyocd.probe.debug_probe import DebugProbe
 from pyocd.core.plugin import Plugin
-from pyocd.core import (exceptions, memory_interface)
+from pyocd.core import exceptions
 
 from ._version import version as plugin_version
 
@@ -45,6 +45,7 @@ LOG = logging.getLogger(__name__)
 
 TRACE = LOG.getChild("trace")
 TRACE.disabled = True
+
 
 class PEMicroProbe(DebugProbe):
     """! @brief Wraps a PEMicro as a DebugProbe."""
@@ -58,7 +59,7 @@ class PEMicroProbe(DebugProbe):
     APSEL_SHIFT = 24
     APSEL_APBANKSEL = APSEL | APBANKSEL
 
-    ## Part of the error message for exceptions raised when there isn't a PEMicro library
+    # Part of the error message for exceptions raised when there isn't a PEMicro library
     # matching the system's architecture, or other similar reasons.
     NO_LIBRARY_ERR = "Unable to find any usable library"
 
@@ -86,7 +87,7 @@ class PEMicroProbe(DebugProbe):
         except PEMicroException as exc:
             # Ignore errors about a missing library, which can happen on systems not supported by
             # the PEMicro library but on which the plugin is installed.
-            if cls.NO_LIBRARY_ERR in exc.message:
+            if cls.NO_LIBRARY_ERR in str(exc):
                 return []
             six.raise_from(cls._convert_exception(exc), exc)
 
@@ -104,7 +105,7 @@ class PEMicroProbe(DebugProbe):
         except PEMicroException as exc:
             # Ignore errors about a missing library, which can happen on systems not supported by
             # the PEMicro library but on which the plugin is installed.
-            if cls.NO_LIBRARY_ERR not in exc.message:
+            if cls.NO_LIBRARY_ERR in str(exc):
                 return None
             six.raise_from(cls._convert_exception(exc), exc)
 
@@ -336,6 +337,7 @@ class PEMicroProbe(DebugProbe):
             return exceptions.ProbeError(str(exc))
         else:
             return exc
+
 
 class PEMicroProbePlugin(Plugin):
     """! @brief Plugin class for PEMicroProbe."""
