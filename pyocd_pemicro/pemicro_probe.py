@@ -36,7 +36,7 @@ from time import sleep
 
 from pyocd.probe.debug_probe import DebugProbe
 from pyocd.core.plugin import Plugin
-from pyocd.core import (exceptions, memory_interface)
+from pyocd.core import exceptions
 
 from ._version import version as plugin_version
 
@@ -44,6 +44,7 @@ LOG = logging.getLogger(__name__)
 
 TRACE = LOG.getChild("trace")
 TRACE.disabled = True
+
 
 class PEMicroProbe(DebugProbe):
     """! @brief Wraps a PEMicro as a DebugProbe."""
@@ -335,6 +336,7 @@ class PEMicroProbe(DebugProbe):
             return exceptions.ProbeError(str(exc))
         else:
             return exc
+
 
 class PEMicroProbePlugin(Plugin):
     """! @brief Plugin class for PEMicroProbe."""

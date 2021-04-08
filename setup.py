@@ -74,6 +74,7 @@ setup(
         'setuptools_scm_git_archive',
         ],
     install_requires = [
+        'pyocd>=0.30.0'
         'pypemicro==0.1.6',
         ],
     entry_points={
