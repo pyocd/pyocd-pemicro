@@ -53,10 +53,9 @@ class PEMicroProbe(DebugProbe):
     DP_SELECT = 0x8
 
     # Bitmasks for AP register address fields.
-    APBANKSEL = 0x000000f0
+    APREG_MASK = 0x000000fc # APBANKSEL | A[3:2]
     APSEL = 0xff000000
     APSEL_SHIFT = 24
-    APSEL_APBANKSEL = APSEL | APBANKSEL
 
     ## Part of the error message for exceptions raised when there isn't a PEMicro library
     # matching the system's architecture, or other similar reasons.
@@ -300,7 +299,9 @@ class PEMicroProbe(DebugProbe):
     def read_ap(self, addr, now=True):
         assert isinstance(addr, int)
         try:
-            value = self._pemicro.read_ap_register(addr=(addr & self.APADDR), now=now, apselect= ((addr & self.APSEL_APBANKSEL) >> self.APSEL_SHIFT))
+            reg_addr = addr & self.APREG_MASK
+            ap_select = (addr & self.APSEL) >> self.APSEL_SHIFT
+            value = self._pemicro.read_ap_register(addr=reg_addr, now=now, apselect=ap_select)
         except PEMicroTransferException as exc:
             raise self._convert_exception(exc) from exc
         else:
@@ -312,7 +313,9 @@ class PEMicroProbe(DebugProbe):
     def write_ap(self, addr, data, now = True):
         assert isinstance(addr, int)
         try:
-            self._pemicro.write_ap_register(addr=(addr & self.APADDR), value=data, apselect=((addr & self.APSEL_APBANKSEL) >> self.APSEL_SHIFT))
+            reg_addr = addr & self.APREG_MASK
+            ap_select = (addr & self.APSEL) >> self.APSEL_SHIFT
+            self._pemicro.write_ap_register(addr=reg_addr, value=data, apselect=ap_select)
         except PEMicroTransferException as exc:
             raise self._convert_exception(exc) from exc
 
