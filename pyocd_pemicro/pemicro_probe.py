@@ -160,7 +160,12 @@ class PEMicroProbe(DebugProbe):
 
     @property
     def capabilities(self):
-        return {self.Capability.SWO, self.Capability.MANAGED_AP_SELECTION, self.Capability.BANKED_DP_REGISTERS, self.Capability.MANAGED_DPBANKSEL}
+        return {
+            self.Capability.SWO,
+            self.Capability.MANAGED_AP_SELECTION,
+            self.Capability.BANKED_DP_REGISTERS,
+            self.Capability.MANAGED_DPBANKSEL,
+            }
 
     def open(self):
         try:
