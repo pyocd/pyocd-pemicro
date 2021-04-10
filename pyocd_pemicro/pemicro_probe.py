@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2020 NXP
-# Copyright © 2020 Chris Reed
+# Copyright © 2020-2021 Chris Reed
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -30,7 +30,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import six
 from pypemicro import PyPemicro, PEMicroException, PEMicroTransferException, PEMicroInterfaces
 import logging
 from time import sleep
@@ -88,7 +87,7 @@ class PEMicroProbe(DebugProbe):
             # the PEMicro library but on which the plugin is installed.
             if cls.NO_LIBRARY_ERR in str(exc):
                 return []
-            six.raise_from(cls._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
 
     @classmethod
     def get_probe_with_id(cls, unique_id, is_explicit=False):
@@ -106,7 +105,7 @@ class PEMicroProbe(DebugProbe):
             # the PEMicro library but on which the plugin is installed.
             if cls.NO_LIBRARY_ERR in str(exc):
                 return None
-            six.raise_from(cls._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
 
     def __init__(self, serial_number):
         super(PEMicroProbe, self).__init__()
@@ -126,7 +125,7 @@ class PEMicroProbe(DebugProbe):
             self._product_name = self._pemicro.version() or "Unknown"
             self._pemicro.close()
         except PEMicroException as exc:
-            six.raise_from(self._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
 
     @property
     def description(self):
@@ -178,14 +177,14 @@ class PEMicroProbe(DebugProbe):
             self._default_protocol = DebugProbe.Protocol.SWD
 
         except PEMicroException as exc:
-            six.raise_from(self._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
 
     def close(self):
         try:
             self._pemicro.close()
             self._is_open = False
         except PEMicroException as exc:
-            six.raise_from(self._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
 
     # ------------------------------------------- #
     #          Target control functions
@@ -219,7 +218,7 @@ class PEMicroProbe(DebugProbe):
             self._pemicro.connect(iface, self.session.options.get("swv_clock"))
             self._protocol = protocol
         except PEMicroException as exc:
-            six.raise_from(self._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
 
     def swj_sequence(self, length, bits):
         raise NotImplementedError()
@@ -232,7 +231,7 @@ class PEMicroProbe(DebugProbe):
         try:
             self._pemicro.set_debug_frequency(frequency)
         except PEMicroException as exc:
-            six.raise_from(self._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
 
     def reset(self):
         try:
@@ -259,14 +258,14 @@ class PEMicroProbe(DebugProbe):
             sleep(self.session.options.get('reset.post_delay'))
 
         except PEMicroException as exc:
-            six.raise_from(self._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
 
     def assert_reset(self, asserted=False):
         try:
             self._pemicro.control_reset_line(asserted)
             self.reset_pin_state = not asserted
         except PEMicroException as exc:
-            six.raise_from(self._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
 
     def is_reset_asserted(self):
         return not self.reset_pin_state
@@ -278,13 +277,13 @@ class PEMicroProbe(DebugProbe):
         try:
             self._pemicro.flush_any_queued_data()
         except Exception as exc:
-            six.raise_from(self._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
 
     def read_dp(self, addr, now=True):
         try:
             value = self._pemicro.read_dp_register(addr=addr, now=now)
         except PEMicroTransferException as exc:
-            six.raise_from(self._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
         else:
             def read_reg_cb():
                 return value
@@ -295,14 +294,14 @@ class PEMicroProbe(DebugProbe):
         try:
             self._pemicro.write_dp_register(addr=addr, value=data)
         except PEMicroTransferException as exc:
-            six.raise_from(self._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
 
     def read_ap(self, addr, now=True):
-        assert type(addr) in (six.integer_types)
+        assert isinstance(addr, int)
         try:
             value = self._pemicro.read_ap_register(addr=(addr & self.APADDR), now=now, apselect= ((addr & self.APSEL_APBANKSEL) >> self.APSEL_SHIFT))
         except PEMicroTransferException as exc:
-            six.raise_from(self._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
         else:
             def read_reg_cb():
                 return value
@@ -310,11 +309,11 @@ class PEMicroProbe(DebugProbe):
             return value if now else read_reg_cb
 
     def write_ap(self, addr, data, now = True):
-        assert type(addr) in (six.integer_types)
+        assert isinstance(addr, int)
         try:
             self._pemicro.write_ap_register(addr=(addr & self.APADDR), value=data, apselect=((addr & self.APSEL_APBANKSEL) >> self.APSEL_SHIFT))
         except PEMicroTransferException as exc:
-            six.raise_from(self._convert_exception(exc), exc)
+            raise cls._convert_exception(exc) from exc
 
     def read_ap_multiple(self, addr, count=1, now=True):
         results = [self.read_ap(addr, True) for n in range(count)]
