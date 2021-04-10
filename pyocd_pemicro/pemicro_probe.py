@@ -86,7 +86,7 @@ class PEMicroProbe(DebugProbe):
         except PEMicroException as exc:
             # Ignore errors about a missing library, which can happen on systems not supported by
             # the PEMicro library but on which the plugin is installed.
-            if cls.NO_LIBRARY_ERR in exc.message:
+            if cls.NO_LIBRARY_ERR in str(exc):
                 return []
             six.raise_from(cls._convert_exception(exc), exc)
 
@@ -104,7 +104,7 @@ class PEMicroProbe(DebugProbe):
         except PEMicroException as exc:
             # Ignore errors about a missing library, which can happen on systems not supported by
             # the PEMicro library but on which the plugin is installed.
-            if cls.NO_LIBRARY_ERR not in exc.message:
+            if cls.NO_LIBRARY_ERR in str(exc):
                 return None
             six.raise_from(cls._convert_exception(exc), exc)
 
