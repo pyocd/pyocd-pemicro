@@ -111,7 +111,7 @@ class PEMicroProbe(DebugProbe):
         super(PEMicroProbe, self).__init__()
         self._pemicro = self._get_pemicro()
         if self._pemicro is None:
-            raise PEMicroException("unable to get PEMicro DLL")
+            raise exceptions.ProbeError("unable to get PEMicro DLL")
 
         self._serial_number = serial_number
         self._supported_protocols = None
