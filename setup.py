@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2020 NXP
-# Copyright @ 2020 Chris Reed
+# Copyright © 2020-2021 Chris Reed
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -44,11 +44,11 @@ setup(
     description='PyOCD debug probe plugin for PEMicro debug probes',
     long_description_content_type="text/markdown",
     long_description=README,
-    platforms="Windows, Linux, Mac OSX",
+    platforms="Windows, Linux, macOS",
     license='BSD-3-Clause',
     packages=find_packages(),
-    author='Petr Gargulak',
-    author_email='petr.gargulak@nxp.com',
+    author='Petr Gargulak, Chris Reed',
+    author_email='petr.gargulak@nxp.com, chris.reed@arm.com',
     keywords=['PEMicro', 'PyPEMicro', 'PyOCD', 'PyOCD Plugin'],
     url='https://github.com/pyocd/pyocd-pemicro',
     download_url='https://pypi.org/project/pyocd_pemicro/',
@@ -74,7 +74,7 @@ setup(
         'setuptools_scm_git_archive',
         ],
     install_requires = [
-        'pypemicro>=0.1.5',
+        'pypemicro==0.1.6',
         ],
     entry_points={
         'pyocd.probe': [
