@@ -61,8 +61,18 @@ class PEMicroProbe(DebugProbe):
     # matching the system's architecture, or other similar reasons.
     NO_LIBRARY_ERR = "Unable to find any usable library"
 
+    _set_pypemicro_log_level = False
+    _saved_pypemicro_logger_level = 0
+
     @classmethod
     def _get_pemicro(cls):
+        # Work around voluminous logging from pypemicro.
+        if not cls._set_pypemicro_log_level:
+            cls._set_pypemicro_log_level = True
+            pelogger = logging.getLogger('pypemicro')
+            cls._saved_pypemicro_logger_level = pelogger.getEffectiveLevel()
+            pelogger.setLevel(logging.WARNING)
+
         # PEMicroException is raised by PyPemicro if the PEMicro DLL cannot be found.
         try:
             return PyPemicro(log_debug=TRACE.debug,
@@ -112,6 +122,10 @@ class PEMicroProbe(DebugProbe):
         self._pemicro = self._get_pemicro()
         if self._pemicro is None:
             raise exceptions.ProbeError("unable to get PEMicro DLL")
+
+        # Set log level back to what it was originally. Note that this trick has race issues if multiple probes
+        # are accessed simultaneously within one process.
+        logging.getLogger('pypemicro').setLevel(self._saved_pypemicro_logger_level)
 
         self._serial_number = serial_number
         self._supported_protocols = []
