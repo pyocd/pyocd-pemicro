@@ -114,11 +114,10 @@ class PEMicroProbe(DebugProbe):
             raise exceptions.ProbeError("unable to get PEMicro DLL")
 
         self._serial_number = serial_number
-        self._supported_protocols = None
+        self._supported_protocols = []
         self._protocol = None
         self._default_protocol = None
         self._is_open = False
-        self._reset_delay_ms = -1
         self.reset_pin_state = True
         try:
             self._pemicro.open(self._serial_number)
@@ -196,6 +195,8 @@ class PEMicroProbe(DebugProbe):
     # ------------------------------------------- #
     def connect(self, protocol=None):
         """! @brief Connect to the target via JTAG or SWD."""
+        assert self.session
+
         # Handle default protocol.
         if (protocol is None) or (protocol == DebugProbe.Protocol.DEFAULT):
             protocol = self._default_protocol
@@ -209,6 +210,8 @@ class PEMicroProbe(DebugProbe):
             iface = PEMicroInterfaces.SWD
         elif protocol == DebugProbe.Protocol.JTAG:
             iface = PEMicroInterfaces.JTAG
+        else:
+            raise RuntimeError(f"unexpected protocol value {protocol}")
 
         try:
             if self.session.options.get('pemicro.power'):
@@ -239,6 +242,7 @@ class PEMicroProbe(DebugProbe):
             raise self._convert_exception(exc) from exc
 
     def reset(self):
+        assert self.session
         try:
             # Just do read operation to flush last operation before reset
             # Obviously the Flush doesn't work as excepted :-(
