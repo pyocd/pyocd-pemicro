@@ -91,7 +91,7 @@ class PEMicroProbe(DebugProbe):
             port_list = pemicro.list_ports()
             if port_list is None:
                 return []
-            return [cls(str(info["id"])) for info in port_list]
+            return [cls(pemicro, str(info["id"])) for info in port_list]
         except PEMicroException as exc:
             # Ignore errors about a missing library, which can happen on systems not supported by
             # the PEMicro library but on which the plugin is installed.
@@ -107,7 +107,7 @@ class PEMicroProbe(DebugProbe):
                 return None
             for info in pemicro.list_ports():
                 if str(info["id"]) == unique_id:
-                    return cls(str(info["id"]))
+                    return cls(pemicro, str(info["id"]))
             else:
                 return None
         except PEMicroException as exc:
@@ -117,11 +117,10 @@ class PEMicroProbe(DebugProbe):
                 return None
             raise cls._convert_exception(exc) from exc
 
-    def __init__(self, serial_number):
-        super(PEMicroProbe, self).__init__()
-        self._pemicro = self._get_pemicro()
-        if self._pemicro is None:
-            raise exceptions.ProbeError("unable to get PEMicro DLL")
+    def __init__(self, pemicro: PyPemicro, serial_number: str) -> None:
+        super().__init__()
+        assert pemicro
+        self._pemicro = pemicro
 
         # Set log level back to what it was originally. Note that this trick has race issues if multiple probes
         # are accessed simultaneously within one process.
