@@ -4,6 +4,7 @@
 # pyocd-pemicro workflow for:
 # - checking code with flake8
 # - test build of sdist and wheel
+# - check built sdist and wheel with twine
 
 name: basic test
 
@@ -15,7 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version:
+        - "3.6"
+        - "3.7"
+        - "3.8"
+        - "3.9"
+        - "3.10"
 
     steps:
     - uses: actions/checkout@v2
@@ -36,13 +42,13 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ steps.pip-cache.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.*', '**/pyproject.toml') }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade setuptools pip wheel flake8
+        python -m pip install --upgrade setuptools pip wheel flake8 build twine
 
     - name: Setup flake8 annotations
       # This commit is v1. Using exact commit for security.
@@ -55,4 +61,8 @@ jobs:
 
     - name: Test build
       run: |
-        python setup.py sdist bdist_wheel
+        python -mbuild
+
+    - name: Check packages
+      run: |
+        twine check dist/*
